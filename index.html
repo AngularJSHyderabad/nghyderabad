@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="nghyderabad">
+<head>
+  <meta charset="UTF-8">
+  <title>ngHyderabad</title>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.18/angular.min.js"></script>
+  <script src="https://cdn.firebase.com/js/client/1.0.15/firebase.js"></script>
+  <script src="https://cdn.firebase.com/libs/angularfire/0.7.1/angularfire.min.js"></script>
+  <script src="https://cdn.firebase.com/js/simple-login/1.5.0/firebase-simple-login.js"></script>
+  <script>
+    angular.module('nghyderabad', ['firebase'])
+    function MessagesCtrl($scope, $firebase, $firebaseSimpleLogin) {
+
+      var dataRef = new Firebase('https://nghyderabad.firebaseio.com/') 
+      $scope.messages = $firebase(dataRef);
+
+      $scope.newMessage = '';
+
+      $scope.addMessage = function(e) {
+        if(e.keyCode != 13) return;
+        $scope.messages.$add({name: $scope.loginObj.user.displayName,
+                             message: $scope.newMessage});
+        $scope.newMessage = '';
+      }
+
+      $scope.loginObj = $firebaseSimpleLogin(dataRef);
+    }
+
+  </script>
+
+    <style>
+      @import url(http://fonts.googleapis.com/css?family=Lora:400,700);
+      body {
+        background-color: #ccc;
+        font-family: 'Lora', sans-serif;
+      }
+      article {
+        margin: 0 auto;
+        background-color: #eee;
+        border-radius: 10px;
+        width: 600px;
+      }
+      header {
+        padding: 10px;
+        background-color: #666;
+        border-radius: 10px 10px 0 0;
+        color: #fff;
+      }
+      h1 {
+        float: left;
+      }
+      ul {
+        list-style: none;
+        padding-left: 10px;
+      }
+      header button {
+        float: right;
+      }
+      header:after {
+        content: '';
+        display: table;
+        clear: both;
+      }
+      ul {
+        min-height: 200px;
+        margin: 10px;
+      }
+      input {
+        width: 585px;
+        padding: 5px;
+        border-radius: 0 0 10px 10px;
+      }
+      strong {
+        font-weight: 700;
+      }
+    </style>
+</head>
+<body ng-controller="MessagesCtrl">
+  <article>
+    <header>
+      <h1>ngHyderabad</h1>
+      <button ng-click="loginObj.$login('google')" ng-hide="loginObj.user">Sign in</button>
+      <button ng-click="loginObj.$logout()" ng-show="loginObj.user">Sign out</button>
+    </header>
+    <ul>
+      <li ng-repeat="message in
+        messages"><b>{{message.name}}</b>: {{message.message}}</li>
+    </ul>
+    <input type="text" ng-model="newMessage" ng-keyup="addMessage($event)"
+    ng-show="loginObj.user">
+  </article>
+</body>
+</html>
